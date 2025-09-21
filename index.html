@@ -1,0 +1,634 @@
+import React, { useState } from "react";
+import {
+  Book,
+  Brain,
+  Scale,
+  PenTool,
+  Award,
+  Copy,
+  Check,
+  Loader2,
+  ChevronDown,
+} from "lucide-react";
+
+// Competence Card with distinct colors
+const CompetenciaCard = ({ numero, tituloCompleto, nota, feedback, icone, cor }) => {
+  return (
+    <div
+      className={`rounded-lg shadow p-4 flex items-start gap-4 w-full border-l-8 ${cor} bg-white`}
+    >
+      <div className="text-2xl">{icone}</div>
+      <div>
+        <h3 className="font-bold text-lg">
+          Competência {numero}: {tituloCompleto} ({nota}/200)
+        </h3>
+        <p className="text-gray-600">{feedback}</p>
+      </div>
+    </div>
+  );
+};
+
+// Correction Result
+const ResultadoCorrecao = ({ competencias }) => {
+  const total = competencias.reduce((acc, c) => acc + c.nota, 0);
+  const notaFinal = Math.round((total / 1000) * 1000);
+
+  return (
+    <div className="space-y-4 mt-4">
+      <h2 className="text-2xl font-bold text-center text-blue-800">
+        Resultado da Redação
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        {competencias.map((c, index) => (
+          <CompetenciaCard
+            key={index}
+            numero={index + 1}
+            tituloCompleto={c.tituloCompleto}
+            nota={c.nota}
+            feedback={c.feedback}
+            icone={c.icone}
+            cor={c.cor}
+          />
+        ))}
+      </div>
+      <div className="text-center mt-6 text-3xl font-extrabold text-orange-500">
+        Nota Final: {notaFinal}/1000
+      </div>
+    </div>
+  );
+};
+
+// Ready Repertories
+const Repertorios = ({ repertorios }) => {
+  const [expandido, setExpandido] = useState(null);
+
+  const toggleExpand = (index) => {
+    setExpandido(expandido === index ? null : index);
+  };
+
+  return (
+    <div className="space-y-4 mt-4">
+      {repertorios.map((r, i) => (
+        <Card
+          key={i}
+          titulo={r.titulo}
+          icone={<Book size={24} />}
+          onClick={() => toggleExpand(i)}
+          expandido={expandido === i}
+        >
+          {expandido === i && (
+            <div className="mt-2">
+              <ul className="list-disc pl-5 text-gray-700 space-y-2">
+                {r.itens.map((item, j) => (
+                  <li key={j}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </Card>
+      ))}
+    </div>
+  );
+};
+
+// Essay Examples
+const Exemplos = ({ exemplos }) => {
+  const [copiado, setCopiado] = useState(null);
+  const [expandido, setExpandido] = useState(null);
+
+  const toggleExpand = (index) => {
+    setExpandido(expandido === index ? null : index);
+  };
+
+  const copiarTexto = (index, texto) => {
+    const el = document.createElement("textarea");
+    el.value = texto;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand("copy");
+    document.body.removeChild(el);
+
+    setCopiado(index);
+    setTimeout(() => setCopiado(null), 2000);
+  };
+
+  return (
+    <div className="space-y-4 mt-4">
+      {exemplos.map((ex, i) => (
+        <Card
+          key={i}
+          titulo={ex.titulo}
+          icone={<PenTool size={24} />}
+          onClick={() => toggleExpand(i)}
+          expandido={expandido === i}
+        >
+          {expandido === i && (
+            <div className="mt-2">
+              <p className="mb-2 text-gray-700 leading-relaxed">{ex.texto}</p>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  copiarTexto(i, ex.texto);
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-orange-500 text-white rounded hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                aria-label={`Copiar redação: ${ex.titulo}`}
+              >
+                {copiado === i ? <Check /> : <Copy />}
+                {copiado === i ? "Copiado" : "Copiar"}
+              </button>
+            </div>
+          )}
+        </Card>
+      ))}
+    </div>
+  );
+};
+
+// Universal Structure
+const Estrutura = () => {
+  return (
+    <div className="space-y-6 mt-4 p-4 bg-white rounded-lg shadow">
+      <h2 className="text-2xl font-bold text-blue-800">
+        Estrutura Universal da Redação
+      </h2>
+      <p className="text-gray-700">
+        Este modelo serve como um guia para você estruturar qualquer tema de redação do ENEM. Lembre-se de adaptá-lo ao seu tema, de usar um repertório sociocultural sólido e de fazer um bom uso dos conectivos.
+      </p>
+
+      {/* Introdução */}
+      <div className="space-y-2 border-l-4 border-blue-500 pl-4">
+        <h3 className="text-xl font-semibold text-blue-700">
+          1. Introdução
+        </h3>
+        <p className="text-gray-600">
+          A introdução é o seu cartão de visitas. Nela, você deve apresentar o tema de forma geral e, em seguida, definir sua tese (o problema e suas causas).
+          <br />
+          <strong className="text-blue-800">Detalhes:</strong>
+          <ul>
+            <li>
+              <span className="font-semibold">Contextualização:</span> Inicie com um repertório (dado histórico, citação, filme) que se relacione com o tema.
+            </li>
+            <li>
+              <span className="font-semibold">Tema:</span> Apresente o tema de forma clara.
+            </li>
+            <li>
+              <span className="font-semibold">Tese:</span> Posicione-se sobre o problema e apresente os dois principais argumentos (causas) que você vai desenvolver nos parágrafos seguintes.
+            </li>
+          </ul>
+        </p>
+        <p className="text-gray-800 italic">
+          **Frase-modelo:** "No contexto do tema, é inegável que [problema] seja uma realidade. Tal cenário se configura devido a [causa 1] e [causa 2]."
+        </p>
+      </div>
+
+      {/* Desenvolvimento 1 */}
+      <div className="space-y-2 border-l-4 border-green-500 pl-4">
+        <h3 className="text-xl font-semibold text-green-700">
+          2. Desenvolvimento 1
+        </h3>
+        <p className="text-gray-600">
+          Este parágrafo deve desenvolver a **causa 1** apresentada na tese. Use um **repertório** (dado, teoria, citação) para comprovar sua argumentação.
+          <br />
+          <strong className="text-green-800">Detalhes:</strong>
+          <ul>
+            <li>
+              <span className="font-semibold">Tópico frasal:</span> Inicie o parágrafo com uma frase que retoma o primeiro argumento da tese.
+            </li>
+            <li>
+              <span className="font-semibold">Repertório e argumento:</span> Apresente o repertório sociocultural e relacione-o ao seu argumento, mostrando como ele comprova sua tese.
+            </li>
+            <li>
+              <span className="font-semibold">Aprofundamento:</span> Explique como a causa se manifesta na sociedade, conectando-a ao problema central da redação.
+            </li>
+          </ul>
+        </p>
+        <p className="text-gray-800 italic">
+          **Frase-modelo:** "Em primeira análise, o problema é agravado por [causa 1]. Segundo [repertório sociocultural], tal contexto se manifesta por [explicação do seu argumento]."
+        </p>
+      </div>
+
+      {/* Desenvolvimento 2 */}
+      <div className="space-y-2 border-l-4 border-yellow-500 pl-4">
+        <h3 className="text-xl font-semibold text-yellow-700">
+          3. Desenvolvimento 2
+        </h3>
+        <p className="text-gray-600">
+          Este parágrafo deve desenvolver a **causa 2** apresentada na tese. Use outro **repertório** ou aprofunde a discussão para sustentar o seu ponto de vista.
+          <br />
+          <strong className="text-yellow-800">Detalhes:</strong>
+          <ul>
+            <li>
+              <span className="font-semibold">Tópico frasal:</span> Comece com um conectivo que estabeleça progressão ("Ademais", "Outrossim") e retome o segundo argumento.
+            </li>
+            <li>
+              <span className="font-semibold">Repertório e argumento:</span> Use um novo repertório (ou aprofunde o anterior, se cabível) para sustentar a segunda causa.
+            </li>
+            <li>
+              <span className="font-semibold">Aprofundamento:</span> Explique como essa causa também contribui para a persistência do problema.
+            </li>
+          </ul>
+        </p>
+        <p className="text-gray-800 italic">
+          **Frase-modelo:** "Ademais, [causa 2] também contribui para a persistência do problema. Nessa perspectiva, o [repertório sociocultural] evidencia que [explicação do seu argumento]."
+        </p>
+      </div>
+
+      {/* Conclusão */}
+      <div className="space-y-2 border-l-4 border-orange-500 pl-4">
+        <h3 className="text-xl font-semibold text-orange-700">
+          4. Conclusão
+        </h3>
+        <p className="text-gray-600">
+          A conclusão é o fechamento do seu texto e deve apresentar uma **proposta de intervenção** completa para o problema.
+          <br />
+          <strong className="text-orange-800">Detalhes:</strong>
+          <ul>
+            <li>
+              <span className="font-semibold">Agente:</span> Quem vai executar a ação? (Ex: Governo Federal, Ministério da Educação, Organizações Não Governamentais).
+            </li>
+            <li>
+              <span className="font-semibold">Ação:</span> O que será feito? (Ex: criar campanhas, investir em infraestrutura).
+            </li>
+            <li>
+              <span className="font-semibold">Meio/Modo:</span> Como a ação será executada? (Ex: por meio de verbas públicas, através de parcerias).
+            </li>
+            <li>
+              <span className="font-semibold">Finalidade:</span> Para que a ação será feita? (Ex: para conscientizar a população, para garantir o acesso).
+            </li>
+            <li>
+              <span className="font-semibold">Detalhamento:</span> Dê mais detalhes sobre um dos elementos anteriores para mostrar que a proposta é viável. (Ex: o Ministério da Educação, que fará...)
+            </li>
+          </ul>
+        </p>
+        <p className="text-gray-800 italic">
+          **Frase-modelo:** "Portanto, para mitigar os desafios, é fundamental a atuação do [Agente], que deve [Ação], por meio de [Meio]. Com isso, espera-se que [Finalidade]. Tais medidas podem [Detalhamento]."
+        </p>
+      </div>
+    </div>
+  );
+};
+
+
+// Generic Card
+const Card = ({ titulo, icone, children, onClick, expandido }) => (
+  <div className="bg-white shadow rounded p-4 flex flex-col gap-2 cursor-pointer transition-all duration-300">
+    <div className="flex items-center justify-between gap-2" onClick={onClick}>
+      <div className="flex items-center gap-2">
+        {icone}
+        <h3 className="font-bold text-lg">{titulo}</h3>
+      </div>
+      {onClick && (
+        <ChevronDown
+          className={`text-gray-500 transition-transform duration-300 ${
+            expandido ? "rotate-180" : ""
+          }`}
+        />
+      )}
+    </div>
+    {children}
+  </div>
+);
+
+// Main Component
+export default function App() {
+  const [textoRedacao, setTextoRedacao] = useState("");
+  const [resultado, setResultado] = useState(null);
+  const [modeloCorrigido, setModeloCorrigido] = useState(null);
+  const [tabAtiva, setTabAtiva] = useState("correcao");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Real repertories and examples
+  const repertorios = [
+    {
+      titulo: "Educação",
+      itens: [
+        "Paulo Freire e a pedagogia da autonomia: 'A educação não transforma o mundo. A educação muda as pessoas. Pessoas transformam o mundo.'",
+        "O Mito da Caverna de Platão: 'É possível relacionar a alegoria platônica da caverna, que retrata a busca pela verdade e o contato com o conhecimento, à falta de acesso à educação para deficientes visuais no Brasil.'",
+        "Declaração Universal dos Direitos Humanos (Artigo 26): 'O Artigo 26 da DUDH garante o direito à educação para todos, mas a defasagem na formação educacional de surdos, por exemplo, mostra que esse ideal ainda não foi alcançado no Brasil.'",
+        "Maria Montessori e o 'Método Montessori': 'A visão montessoriana de uma educação centrada no aluno, que valoriza a autonomia e a autoeducação, contrasta com o modelo tradicional e pode ser usada para defender a inovação pedagógica.'",
+        "Anísio Teixeira e a 'escola nova': 'Teixeira foi um dos maiores defensores da educação pública no Brasil, idealizando uma escola inclusiva e de qualidade para todos, o que se relaciona com os desafios de acesso e permanência no ensino superior.'",
+      ],
+    },
+    {
+      titulo: "Meio Ambiente",
+      itens: [
+        "Teoria da 'Tragédia dos Comuns' de Garrett Hardin: 'O conceito de Hardin, que afirma que a busca individual por recursos leva à sua exaustão, pode ser aplicado à exploração descontrolada de recursos naturais no Brasil.'",
+        "O conceito de 'Antropoceno': 'A atual era geológica, o Antropoceno, é marcada pela influência humana no planeta. Esse conceito é essencial para discutir o desmatamento e as mudanças climáticas causadas pelo homem.'",
+        "Agenda 21: 'A Agenda 21, resultado da Rio-92, estabeleceu compromissos para o desenvolvimento sustentável, mas os desafios atuais demonstram a necessidade de se buscar soluções para a preservação ambiental.'",
+        "Conferência de Estocolmo (1972): 'Considerada o marco inicial da conscientização ambiental global, a Conferência de Estocolmo foi o primeiro grande evento a discutir a relação entre desenvolvimento econômico e meio ambiente.'",
+        "A 'Primavera Silenciosa' de Rachel Carson: 'O livro de Carson alertou sobre os perigos do uso de pesticidas, sendo um divisor de águas na criação de políticas de proteção ambiental e na popularização do movimento ecológico.'",
+      ],
+    },
+    {
+      titulo: "Tecnologia",
+      itens: [
+        "A 'Sociedade do Espetáculo' de Guy Debord: 'A obra de Debord denuncia a alienação do indivíduo em meio à espetacularização da vida, uma ideia aplicável à constante exposição nas redes sociais.'",
+        "O livro '1984' de George Orwell: 'A distopia de Orwell, com a figura do Grande Irmão, pode ser usada para questionar a manipulação de dados e a vigilância na internet, que colocam em risco a privacidade e a liberdade individual.'",
+        "O Dilema das Redes (documentário): 'O filme discute o impacto das redes sociais na sociedade e como elas usam algoritmos para moldar o comportamento dos usuários, um tema crucial para a redação do ENEM.'",
+        "Poder disciplinar (Michel Foucault): 'A vigilância digital, através do monitoramento de dados e do rastreamento de localização, pode ser comparada ao 'poder disciplinar' de Foucault, que busca normatizar e controlar os indivíduos na sociedade.'",
+      ],
+    },
+    {
+      titulo: "Saúde Pública",
+      itens: [
+        "Criação do Sistema Único de Saúde (SUS) no Brasil (Constituição de 1988): 'A universalidade, integralidade e equidade do SUS, princípios fundamentais, são base para argumentar sobre a importância do acesso à saúde para todos os cidadãos, apesar dos desafios.'",
+        "A 'Medicina Social' de Rudolf Virchow: 'Virchow defendia que as doenças são um reflexo das condições sociais e econômicas, e que a saúde é um direito social. Essa ideia pode ser usada para discutir a desigualdade no acesso à saúde.'",
+        "Filosofia de Thomas Hobbes e a ideia de 'Estado de Natureza': 'O caos hobbesiano, onde 'o homem é o lobo do homem', pode ser usado para ilustrar a necessidade de uma ação estatal coordenada, como campanhas de vacinação, para garantir o bem-estar coletivo.'",
+      ],
+    },
+    {
+      titulo: "Segurança e Violência",
+      itens: [
+        "Teoria do 'Panóptico' de Jeremy Bentham: 'A ideia de uma prisão onde os presos são constantemente vigiados se relaciona com a sensação de vigilância contínua na sociedade atual, seja por câmeras de segurança ou monitoramento digital, impactando a privacidade.'",
+        "Teoria da 'Anomia' de Émile Durkheim: 'O conceito de anomia, que se refere à ausência de normas sociais, pode ser utilizado para explicar o aumento da criminalidade em contextos de desestruturação social, como a falta de oportunidades e o desemprego.'",
+        "Conceito de 'Estado de Sítio': 'O Estado de Sítio, que suspende os direitos individuais em momentos de crise, pode ser um repertório para discutir a relação entre segurança pública e a limitação de liberdades civis.'",
+      ],
+    },
+    {
+      titulo: "Cultura e Manifestações Artísticas",
+      itens: [
+        "Manifesto Antropofágico de Oswald de Andrade: 'O manifesto, que defendia a absorção de influências estrangeiras e sua transformação em algo autenticamente nacional, é um excelente repertório para discutir a identidade cultural brasileira.'",
+        "Movimento 'Tropicália' (Caetano Veloso e Gilberto Gil): 'A Tropicália, que misturou elementos da cultura popular com a vanguarda artística, pode ser usada para ilustrar a diversidade cultural e a resistência artística frente à repressão.'",
+        "Obras de Aleijadinho (Antônio Francisco Lisboa): 'A arte barroca de Aleijadinho, que misturava elementos europeus com a realidade colonial brasileira, é um exemplo da riqueza cultural do país e pode ser usada para discutir a preservação do patrimônio histórico.'",
+      ],
+    },
+  ];
+
+  const exemplos = [
+    {
+      titulo:
+        "Redação Nota 1000 - Desafios para a formação educacional de surdos no Brasil (2017)",
+      texto:
+        "Na obra '1984', de George Orwell, é retratado um futuro distópico em que o governo totalitário controla e manipula o comportamento de seus cidadãos por meio de 'teletelas'. Embora a realidade seja distinta da ficção, é possível perceber as 'teletelas' hodiernas em dispositivos eletrônicos, como computadores e smartphones, que permitem um controle de dados de forma silenciosa e, muitas vezes, imperceptível para a sociedade. Nesse sentido, a manipulação do comportamento do usuário pelo controle de dados é um problema presente, com o qual a sociedade deve se preocupar, visto que ela impede o exercício de uma autonomia plena do cidadão. Desse modo, é fundamental analisar os impactos dessa problemática no Brasil. \n\n Em primeira análise, o indivíduo é constantemente influenciado, sendo impossível exercer o seu livre-arbítrio. De acordo com o filósofo e sociólogo Michel Foucault, o poder manifesta-se por meio de corpos dóceis e disciplinados, que se comportam de maneira previsível e repetitiva. Tal analogia é perfeitamente aplicável ao modo de vida atual, que, de certa forma, é regulamentado por algoritmos que moldam o comportamento do sujeito. Isso ocorre devido às 'bolhas sociais' criadas pelos sites de busca e pelas redes sociais que, ao se utilizar do controle de dados, acabam direcionando o conteúdo que o usuário deve consumir. Por consequência, a pessoa acaba ficando presa a uma única opinião ou estilo de vida, sendo impedida de pensar fora desse círculo ideológico, em um claro cerceamento de sua liberdade de escolha e autonomia. \n\n Em segunda análise, a democratização da internet no país não gerou a esperada democratização do acesso à informação. Conforme o filósofo e sociólogo Herbert Marcuse, a sociedade contemporânea é marcada pelo fenômeno do 'homem unidimensional', aquele que, ao ter acesso a uma gama infinita de informações, é incapaz de selecionar o que é de fato relevante, e acaba se alienando ao que é fútil e desnecessário. Nesse sentido, é possível perceber que o uso de dados para controlar a informação faz com que o sujeito se prenda a informações de baixo valor. Isso fica evidente, por exemplo, no crescente interesse por notícias falsas – as 'fake news' – que, por serem mais sensacionalistas e criarem mais engajamento, acabam sendo difundidas com uma rapidez alarmante, dificultando o acesso a informações sérias e de qualidade. Desse modo, a população fica mais vulnerável e suscetível à manipulação do que é real e do que é falso. \n\n Desse modo, o controle de dados pode acabar cerceando a autonomia individual do cidadão e dificultando a sua compreensão sobre o mundo real. Para que esse problema seja mitigado, é imprescindível que o Estado e as empresas de tecnologia, por meio de uma ação conjunta, criem uma legislação específica para a utilização de dados no ambiente virtual. Tal legislação deveria ser votada no Congresso, e ter como objetivo a criação de uma espécie de 'patrulha' para fiscalizar a atuação dos algoritmos de controle de informação, evitando a disseminação de fake news e o cerceamento de informações de qualidade para a população. Além disso, caberia às escolas, por intermédio de projetos educativos e aulas de tecnologia, a tarefa de promover debates e conscientizar os alunos sobre a importância de se filtrar informações de fontes confiáveis, mostrando as consequências da exposição irresponsável de dados. Assim, seria possível formar cidadãos mais críticos e autônomos, capazes de se posicionar de maneira mais consciente diante dos desafios da sociedade digital.",
+    },
+    {
+      titulo:
+        "Redação Nota 1000 - Democratização do acesso ao cinema no Brasil (2019)",
+      texto:
+        "A sétima arte, nascida como uma forma de entretenimento, rapidamente se tornou uma poderosa ferramenta de comunicação e, mais do que isso, de transformação social. No Brasil, o cinema, apesar de sua importância, ainda não alcançou uma democratização efetiva, revelando-se um desafio que perpassa as esferas socioeconômica e cultural. Sendo assim, é fundamental analisar as barreiras que impedem o acesso pleno do brasileiro à cultura cinematográfica, bem como as possíveis soluções para essa problemática. \n\n Em primeira análise, a desigualdade socioeconômica é um dos principais entraves para a democratização do cinema. De acordo com o geógrafo Milton Santos, o espaço geográfico brasileiro é marcado por profundas assimetrias, em que as áreas mais ricas e desenvolvidas concentram a maioria dos equipamentos culturais, como cinemas e teatros, enquanto as periferias e as áreas rurais são desprovidas desses recursos. Essa concentração urbana de equipamentos de lazer e cultura torna o acesso ao cinema uma privilégio para poucos, limitando a experiência a uma pequena parcela da população. Dessa forma, a distância física e a falta de recursos financeiros para o ingresso e o transporte impedem que a cultura cinematográfica seja verdadeiramente popularizada. \n\n Em segunda análise, o desafio da democratização do cinema se manifesta também na esfera cultural. A ausência de uma cultura de frequentar o cinema, somada à desvalorização da produção cinematográfica nacional, contribui para que a sétima arte seja vista como algo distante e elitista. A forte influência da indústria cultural estrangeira, em especial a hollywoodiana, faz com que a população consuma predominantemente filmes de origem americana, em detrimento das produções brasileiras. Isso se dá, em parte, pela falta de incentivo e de políticas públicas que promovam a produção e a difusão do cinema nacional, que, muitas vezes, é ignorado pelos próprios brasileiros. Essa desvalorização se reflete na baixa procura por filmes nacionais, que, por sua vez, acabam por não serem exibidos em salas comerciais, criando um ciclo vicioso que prejudica o setor. \n\n Diante desse contexto, é inegável que a democratização do acesso ao cinema no Brasil demanda a adoção de medidas conjuntas entre Estado e sociedade. Cabe ao governo, por meio do Ministério da Cultura, criar e implementar políticas públicas que incentivem a criação de novas salas de cinema em áreas periféricas e em cidades do interior, além de subsidiar o valor dos ingressos para a população de baixa renda, com o objetivo de reduzir a barreira socioeconômica. Além disso, é de responsabilidade das escolas e da mídia em geral promover a cultura cinematográfica brasileira, incentivando a exibição de filmes nacionais em salas de aula e em canais de televisão abertos. Assim, a sétima arte poderá, de fato, se tornar uma ferramenta de transformação social, alcançando a todos os brasileiros.",
+    },
+    {
+      titulo:
+        "A persistência da violência contra a mulher na sociedade brasileira (2015)",
+      texto:
+        "Na tragédia grega 'Medéia', de Eurípides, a personagem-título, após ser abandonada pelo marido Jasão, comete atos de extrema violência para se vingar. A obra, apesar de clássica, ilustra uma problemática contemporânea: a violência de gênero, que, no Brasil, persiste em pleno século XXI. Essa continuidade é resultado, principalmente, da herança histórica de uma sociedade patriarcal e de uma insuficiência no sistema de denúncias e proteção. \n\n Primeiramente, a cultura de violência contra a mulher tem raízes históricas profundas. Desde o período colonial, o Brasil foi construído sob uma base patriarcal, onde o homem detinha o poder e a mulher era vista como submissa e propriedade. Essa mentalidade, que foi perpetuada por séculos, ainda se reflete em comportamentos e normas sociais que banalizam a violência de gênero, dificultando o reconhecimento da gravidade do problema. A máxima 'em briga de marido e mulher ninguém mete a colher' é um triste exemplo de como a sociedade brasileira ainda tolera a violência doméstica, perpetuando o ciclo de agressão e silêncio. \n\n Em segundo lugar, o sistema de proteção e denúncia à mulher agredida é deficiente. A Lei Maria da Penha (Lei nº 11.340/06), embora seja um avanço legislativo, não é suficiente para coibir a violência por si só. A falta de delegacias especializadas, o despreparo de muitos agentes de segurança e a burocracia do sistema de justiça desestimulam as vítimas a buscarem ajuda. Além disso, o estigma social e a dependência financeira em relação ao agressor são barreiras que impedem que muitas mulheres saiam da situação de risco. A ausência de uma rede de apoio completa e eficiente contribui para a persistência da violência, demonstrando que a lei, sem a infraestrutura necessária, perde sua efetividade. \n\n Portanto, é fundamental que o Estado e a sociedade atuem em conjunto para combater a violência contra a mulher. Cabe ao governo, por meio do Ministério da Mulher, criar e expandir centros de atendimento e delegacias especializadas, além de investir na capacitação de profissionais para lidar com a violência de gênero de forma humanizada. Além disso, é de responsabilidade da sociedade promover uma mudança cultural, desconstruindo o machismo e o patriarcado desde a infância, por meio da educação e do diálogo. Só assim será possível construir uma sociedade mais justa e segura para as mulheres, onde a 'Medéia' de hoje não precise se vingar, mas sim ter seus direitos garantidos.",
+    },
+    {
+      titulo:
+        "Caminhos para combater a intolerância religiosa no Brasil (2016)",
+      texto:
+        "No livro 'O Cortiço', de Aluísio Azevedo, a diversidade cultural e religiosa do Brasil do século XIX é apresentada em meio a conflitos e preconceitos. A obra, embora ficcional, reflete uma realidade que, lamentavelmente, persiste: a intolerância religiosa. Tal problema, no Brasil, tem suas raízes na falta de conhecimento sobre as diferentes religiões e na ausência de uma fiscalização eficaz por parte do Estado. \n\n Em primeiro lugar, a ignorância sobre as diferentes manifestações religiosas é um dos principais fatores para a intolerância. A falta de um ensino pluralista e o desconhecimento sobre as religiões de matriz africana, por exemplo, levam à sua demonização e a uma visão preconceituosa. O Brasil, um país com uma das maiores diversidades religiosas do mundo, é palco de ataques e agressões a terreiros de candomblé e a praticantes de umbanda. A falta de informação e de respeito pela crença do outro é o principal combustível para a intolerância, reforçando a necessidade de se buscar a valorização da diversidade religiosa. \n\n Em segundo lugar, a ausência de uma fiscalização rigorosa por parte do Estado contribui para o aumento da intolerância. Apesar de a Constituição Federal de 1988 garantir a liberdade de crença e de culto a todos os cidadãos, os crimes de ódio e a discriminação religiosa muitas vezes não são investigados e punidos. A impunidade, somada à falta de políticas públicas de combate à intolerância, faz com que os agressores se sintam seguros para cometerem crimes sem medo de retaliação. A falta de ação do Estado, que deveria garantir a segurança e a liberdade religiosa de todos os cidadãos, contribui para que a intolerância se perpetue. \n\n Portanto, é fundamental que o Estado e a sociedade atuem em conjunto para combater a intolerância religiosa no Brasil. Cabe ao governo, por meio do Ministério da Educação, criar e implementar políticas públicas que incentivem o ensino de história das religiões em escolas, promovendo a tolerância e o respeito à diversidade desde cedo. Além disso, é de responsabilidade do Estado, por meio das polícias e do judiciário, investir na investigação e na punição de crimes de ódio, garantindo que os agressores sejam responsabilizados por seus atos. Só assim será possível construir uma sociedade mais plural e respeitosa, onde a fé de cada um seja vista como um direito, e não como uma ameaça.",
+    },
+    {
+      titulo:
+        "O impacto da inteligência artificial na sociedade brasileira (2020)",
+      texto:
+        "O filme 'Blade Runner', de Ridley Scott, explora um futuro em que a inteligência artificial (IA) é indistinguível dos seres humanos, levantando questões sobre ética e humanidade. Embora a realidade atual seja distinta da ficção, a IA já se faz presente em nosso cotidiano, moldando a sociedade brasileira de forma significativa. No entanto, o seu desenvolvimento e a sua aplicação ainda enfrentam desafios, como a falta de regulamentação e o impacto no mercado de trabalho. \n\n Em primeira análise, a falta de uma regulamentação específica para a IA é um dos principais desafios. Atualmente, a IA é usada em diversas áreas, desde o setor de saúde, com diagnósticos mais precisos, até o setor financeiro, com a análise de dados e a prevenção de fraudes. No entanto, a ausência de uma legislação que estabeleça limites e responsabilidades para o uso da IA gera preocupações sobre a privacidade de dados e a tomada de decisões por algoritmos. A falta de transparência sobre como as decisões são tomadas, somada à possibilidade de viés e discriminação, faz com que a IA se torne um risco para a sociedade, demonstrando a necessidade de se buscar uma regulamentação clara e eficaz. \n\n Em segundo lugar, o impacto da IA no mercado de trabalho é uma preocupação crescente. A automação de tarefas e a substituição de empregos por robôs e algoritmos são uma realidade que, embora traga ganhos de produtividade e eficiência, também gera preocupações sobre o desemprego e a desigualdade social. A falta de uma política de requalificação de trabalhadores e a ausência de um debate público sobre as consequências da IA no mercado de trabalho são um entrave para o seu desenvolvimento. O Brasil, um país com uma alta taxa de desemprego, precisa de uma estratégia para lidar com a IA, garantindo que ela seja usada para o bem-estar social, e não para o aumento da desigualdade. \n\n Portanto, é fundamental que o Estado e a sociedade atuem em conjunto para lidar com o impacto da IA no Brasil. Cabe ao governo, por meio do Congresso, criar uma legislação que regulamente o uso da IA, estabelecendo limites e responsabilidades para as empresas e garantindo a privacidade de dados. Além disso, é de responsabilidade da sociedade e das escolas promoverem uma educação digital, ensinando os cidadãos a lidar com a IA de forma crítica e a se prepararem para o mercado de trabalho do futuro. Só assim será possível garantir que a IA seja uma ferramenta para o progresso, e não para o aumento da desigualdade.",
+    },
+  ];
+
+  const corrigirRedacao = async () => {
+    if (!textoRedacao.trim()) {
+      setResultado(null);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    setResultado(null);
+    setModeloCorrigido(null);
+
+    const systemPromptCorrecao = "Você é um corretor de redações do ENEM extremamente rigoroso, como os corretores das bancas oficiais mais impiedosas. Sua missão é fazer uma análise implacável da redação do usuário, sem perdoar a menor falha. As notas devem ser em múltiplos de 40. Retorne o resultado em JSON. \n\n C1 - Domínio da norma culta: Penalize severamente qualquer desvio. Isso inclui erros de ortografia, gramática, concordância verbal e nominal, regência, crase, pontuação e acentuação. Se houver UMA falha, a nota não poderá ser 200. \n\n C2 - Compreensão do tema: Verifique se o texto não tangencia, não desvia e compreende o tema integralmente em todos os parágrafos. A falta de abordagem de um aspecto do tema ou qualquer tipo de desvio deve ser penalizada drasticamente. \n\n C3 - Organização das ideias: Exija uma estrutura dissertativo-argumentativa perfeita. A argumentação deve ter um projeto de texto claro, com parágrafos bem definidos, encadeamento lógico de ideias, e argumentos que se sustentem mutuamente. A falta de progressão ou a presença de 'frases soltas' deve ser penalizada severamente. Para textos incompletos (apenas introdução, por exemplo), a nota deve ser muito baixa. \n\n C4 - Coesão e coerência: Avalie o uso de conectivos, preposições e pronomes. Verifique se o texto flui perfeitamente entre frases e parágrafos. A repetição de conectivos, a ausência de um elo lógico ou o uso inadequado de coesivos deve penalizar a nota. Para textos incompletos, a nota deve ser a menor possível, pois não há progressão textual. \n\n C5 - Proposta de intervenção: A proposta deve conter OBRIGATORIAMENTE os 5 elementos essenciais: Agente (quem faz?), Ação (o que faz?), Meio/Modo (como faz?), Finalidade (para que faz?) e Detalhamento (informação extra sobre um dos elementos). A ausência, a superficialidade ou a incoerência de qualquer um deles deve resultar em uma nota muito baixa. Para textos incompletos sem proposta de intervenção, a nota deve ser zero ou 40, no máximo. \n\n O formato JSON deve ser: [ { \"titulo\": \"Competência 1\", \"nota\": ..., \"feedback\": \"...\" }, { \"titulo\": \"Competência 2\", \"nota\": ..., \"feedback\": \"...\" }, { \"titulo\": \"Competência 3\", \"nota\": ..., \"feedback\": \"...\" }, { \"titulo\": \"Competência 4\", \"nota\": ..., \"feedback\": \"...\" }, { \"titulo\": \"Competência 5\", \"nota\": ..., \"feedback\": \"...\" } ].";
+    
+    const systemPromptGeracao = "Você é um professor de redação do ENEM. Sua tarefa é pegar o texto do usuário, identificar o tema e reescrever a redação do zero, como se fosse uma redação nota 1000. O texto final deve ser perfeitamente estruturado, com introdução, dois parágrafos de desenvolvimento e uma conclusão completa com os 5 elementos da proposta de intervenção. O texto deve ser impecável em gramática, coesão e coerência. Não mencione o texto original do usuário. Apenas retorne o modelo de redação nota 1000 como texto puro, sem qualquer formatação extra ou comentários.";
+
+
+    const payloadCorrecao = {
+      contents: [{ parts: [{ text: `Corrija a seguinte redação do ENEM:\n\n${textoRedacao}` }] }],
+      systemInstruction: {
+        parts: [{ text: systemPromptCorrecao }],
+      },
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "ARRAY",
+          items: {
+            type: "OBJECT",
+            properties: {
+              titulo: { type: "STRING" },
+              nota: { type: "NUMBER" },
+              feedback: { type: "STRING" },
+            },
+            propertyOrdering: ["titulo", "nota", "feedback"],
+          },
+        },
+      },
+    };
+
+    const payloadGeracao = {
+      contents: [{ parts: [{ text: `Com base no tema da seguinte redação, gere uma redação modelo nota 1000:\n\n${textoRedacao}` }] }],
+      systemInstruction: {
+        parts: [{ text: systemPromptGeracao }],
+      },
+    };
+
+    const apiKey = "";
+    const apiUrlCorrecao = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+    const apiUrlGeracao = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+    try {
+      // Step 1: Correction
+      let responseCorrecao = await fetch(apiUrlCorrecao, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payloadCorrecao),
+      });
+
+      if (!responseCorrecao.ok) {
+        throw new Error(`Erro na correção: HTTP status ${responseCorrecao.status}`);
+      }
+
+      const resultCorrecao = await responseCorrecao.json();
+      const textCorrecao = resultCorrecao?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (textCorrecao) {
+        let parsedResult;
+        try {
+          parsedResult = JSON.parse(textCorrecao);
+        } catch (e) {
+          setError("Ocorreu um erro no formato da resposta de correção. Tente novamente.");
+          return;
+        }
+
+        if (!Array.isArray(parsedResult) || parsedResult.length !== 5) {
+          setError("A resposta não contém as 5 competências. Tente novamente.");
+          return;
+        }
+
+        const tituloMap = {
+          "Competência 1": "Domínio da norma culta",
+          "Competência 2": "Compreensão do tema",
+          "Competência 3": "Organização das ideias",
+          "Competência 4": "Coesão textual",
+          "Competência 5": "Proposta de intervenção",
+        };
+
+        const competenciasComIcones = parsedResult.map((comp, index) => {
+          const icones = [
+            <Scale />,
+            <Brain />,
+            <PenTool />,
+            <Book />,
+            <Award />,
+          ];
+          const cores = [
+            "border-blue-500",
+            "border-green-500",
+            "border-yellow-500",
+            "border-purple-500",
+            "border-orange-500",
+          ];
+          return {
+            ...comp,
+            tituloCompleto: tituloMap[comp.titulo],
+            icone: icones[index],
+            cor: cores[index],
+          };
+        });
+        setResultado(competenciasComIcones);
+      } else {
+        throw new Error("Resposta da IA vazia ou mal formatada para a correção.");
+      }
+      
+      // Step 2: Generation of the perfect essay
+      let responseGeracao = await fetch(apiUrlGeracao, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payloadGeracao),
+      });
+
+      if (!responseGeracao.ok) {
+        throw new Error(`Erro na geração do modelo: HTTP status ${responseGeracao.status}`);
+      }
+
+      const resultGeracao = await responseGeracao.json();
+      const textGeracao = resultGeracao?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (textGeracao) {
+        setModeloCorrigido(textGeracao);
+      } else {
+        throw new Error("Resposta da IA vazia ou mal formatada para a geração do modelo.");
+      }
+      
+    } catch (err) {
+      console.error("Erro no processo de correção:", err);
+      setError("Ocorreu um erro ao corrigir a redação. Por favor, tente novamente.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const copiarTexto = (texto) => {
+    const el = document.createElement("textarea");
+    el.value = texto;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand("copy");
+    document.body.removeChild(el);
+  };
+
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-orange-50 p-4 md:p-8">
+      <header className="text-center mb-6">
+        <h1 className="text-3xl font-bold text-blue-800">
+          Corretor de Redação ENEM
+        </h1>
+        <p className="text-gray-700 mb-4">
+          Cole sua redação e receba feedback completo por competência
+        </p>
+        <img
+          src="https://placehold.co/600x200/5543D7/FFFFFF?text=Redação+ENEM"
+          alt="Estudante escrevendo redação"
+          className="mx-auto rounded shadow"
+        />
+      </header>
+
+      {/* Tabs */}
+      <div className="flex justify-center gap-4 mb-6 flex-wrap">
+        {[
+          { id: "correcao", label: "Correção" },
+          { id: "repertorio", label: "Repertórios" },
+          { id: "exemplos", label: "Exemplos" },
+          { id: "estrutura", label: "Estrutura" },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            className={`px-4 py-2 rounded ${
+              tabAtiva === tab.id
+                ? "bg-blue-500 text-white"
+                : "bg-white text-blue-500 shadow"
+            }`}
+            onClick={() => setTabAtiva(tab.id)}
+            role="tab"
+            aria-selected={tabAtiva === tab.id}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tabs Content */}
+      <div role="tabpanel">
+        {tabAtiva === "correcao" && (
+          <div className="space-y-4">
+            <textarea
+              className="w-full p-4 rounded shadow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              rows="10"
+              placeholder="Cole sua redação aqui..."
+              value={textoRedacao}
+              onChange={(e) => setTextoRedacao(e.target.value)}
+              aria-label="Área para colar redação"
+            />
+            <button
+              className={`px-6 py-2 rounded text-white font-bold bg-gradient-to-r from-blue-500 to-orange-500 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center justify-center gap-2`}
+              onClick={corrigirRedacao}
+              disabled={!textoRedacao.trim() || isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="animate-spin" /> Corrigindo...
+                </>
+              ) : (
+                "Corrigir"
+              )}
+            </button>
+            {error && <div className="text-red-500 mt-4 text-center">{error}</div>}
+            {resultado && <ResultadoCorrecao competencias={resultado} />}
+            {modeloCorrigido && (
+                <div className="mt-8 p-6 bg-white rounded-lg shadow-lg border-l-8 border-yellow-400">
+                    <h2 className="text-2xl font-bold text-yellow-700 mb-4 flex items-center gap-2">
+                        <Award /> Modelo Corrigido pela IA (Nota 1000)
+                    </h2>
+                    <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">{modeloCorrigido}</p>
+                    <button
+                        onClick={() => copiarTexto(modeloCorrigido)}
+                        className="mt-4 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        aria-label="Copiar modelo corrigido"
+                    >
+                        <Copy /> Copiar
+                    </button>
+                </div>
+            )}
+          </div>
+        )}
+
+        {tabAtiva === "repertorio" && <Repertorios repertorios={repertorios} />}
+        {tabAtiva === "exemplos" && <Exemplos exemplos={exemplos} />}
+        {tabAtiva === "estrutura" && <Estrutura />}
+      </div>
+    </div>
+  );
+}
+
