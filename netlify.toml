@@ -1,4 +1,3 @@
 [build]
+command = "echo 'Não é necessário comando de build'"
 publish = "/"
-[build.processing]
-skip_processing = true
